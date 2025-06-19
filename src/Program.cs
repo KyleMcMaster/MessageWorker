@@ -2,6 +2,13 @@ using MessageWorker;
 
 var builder = Host.CreateDefaultBuilder(args);
 
+builder.ConfigureLogging((context, logging) =>
+{
+    logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+
+    logging.AddConsole();
+});
+
 builder.ConfigureServices((context, services) =>
 {
     services.AddHostedService<MessageSenderWorker>();
@@ -14,11 +21,11 @@ builder.UseNServiceBus(context =>
     var endpointConfiguration = new EndpointConfiguration("MessageWorker");
     endpointConfiguration.UseSerialization<SystemJsonSerializer>();
     // Set the connection string from configuration
-    // string serviceBusEndpoint = context.Configuration.GetConnectionString("AzureServiceBus")!;
+    string serviceBusEndpoint = context.Configuration.GetConnectionString("AzureServiceBus")!;
     // // Configure Azure Service Bus transport
-    // var transport = new AzureServiceBusTransport(serviceBusEndpoint, TopicTopology.Default);
-    // endpointConfiguration.UseTransport(transport);
-    endpointConfiguration.UseTransport<LearningTransport>();
+    var transport = new AzureServiceBusTransport(serviceBusEndpoint, TopicTopology.Default);
+    endpointConfiguration.UseTransport(transport);
+
     // Configure error queue
     endpointConfiguration.SendFailedMessagesTo("error");
 
