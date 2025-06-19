@@ -14,7 +14,6 @@ builder.ConfigureServices((context, services) =>
     services.AddLogging();
 });
 
-// Configure NServiceBus with Azure Service Bus transport
 builder.UseNServiceBus(context =>
 {
     var endpointConfiguration = new EndpointConfiguration("MessageWorker");
@@ -30,6 +29,7 @@ builder.UseNServiceBus(context =>
 
     // Enable installers to create queues
     endpointConfiguration.EnableInstallers();
+    endpointConfiguration.EnableOpenTelemetry();
     
     return endpointConfiguration;
 });
